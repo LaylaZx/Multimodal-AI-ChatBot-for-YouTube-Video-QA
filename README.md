@@ -10,8 +10,11 @@ This project enables real-time question answering for IELTS preparation videos t
 
 Designed for language learners and educators, it ensures 100% transcript-based responses to maintain factual accuracy for exam preparation.
 ---
-##Description
+## Description
+BandUp is an AI-powered chatbot designed to help users interactively answer questions about IELTS preparation videos on YouTube. Users simply provide a YouTube video link, and the system automatically extracts the video’s English subtitles or transcribes the audio, processes the content, and builds a searchable knowledge base. The chatbot then allows users to ask natural language questions and receive answers strictly based on the video’s content, ensuring accuracy and relevance for IELTS exam preparation.
 
+This tool is especially valuable for language learners, teachers, and students who want to quickly review or clarify topics covered in IELTS videos without watching the entire content. BandUp leverages cutting-edge AI techniques to deliver a seamless, source-aware Q&A experience, and can be easily adapted to other educational domains with subtitle-enabled videos.
+---
 
 ## Architecture Overview
 ![RAG Architecture]
