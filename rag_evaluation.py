@@ -1,24 +1,23 @@
-import os
 import csv
-
+# Import RAG pipeline utilities
 from rag_pipeline import (
     load_environment,
     load_and_split_documents,
     create_vectorstore,
-    build_qa_chain,
+    build_qa_chain
 )
 from langchain.evaluation.qa import QAEvalChain, QAGenerateChain
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 
+
 # === Configuration ===
-TRANSCRIPT_PATH = 'transcript.txt'  # Path to the full transcript text file
-INDEX_DIR = 'faiss_index'           # Directory for the FAISS index
-OUTPUT_CSV = 'evaluation_results.csv'  # Output CSV file for evaluation results
-NUM_EXAMPLES = 10                   # Number of QA examples to generate
+TRANSCRIPT_PATH = './transcripts'  # Path to the full transcript text file
+OUTPUT_CSV = './evaluation/evaluation_results.csv'  # Output CSV file for evaluation results
+NUM_EXAMPLES = 50                   # Number of QA examples to generate
+TRANSCRIPT_FILE= './transcripts/How_to_get_a_Band_8_in_IELTS_listening.txt'
 
-
-def load_pipeline():
+def load_pipeline(return_source_documents):
     """
     Load environment variables, prepare documents, create the vectorstore,
     and initialize the QA chain.
@@ -27,40 +26,33 @@ def load_pipeline():
         qa_chain: The RetrievalQA chain for answering queries.
         chat_model: The LLM model used for generation and evaluation.
     """
-    api_key, chat_model = load_environment()
+    api_key, chat_model , _= load_environment()
     docs = load_and_split_documents(TRANSCRIPT_PATH)
     vectorstore = create_vectorstore(
-        docs,
-        api_key,
-        store_type='faiss',
-        persist_dir=INDEX_DIR
+        docs=docs,
+        api_key=api_key
     )
-    qa_chain = build_qa_chain(vectorstore, chat_model,False)
+    qa_chain = build_qa_chain(vectorstore, chat_model, return_source_documents)
     return qa_chain, chat_model
 
 
 def generate_examples(chat_model, num_examples: int = NUM_EXAMPLES) -> list[dict]:
     """
-    Use QAGenerateChain to create QA examples from the transcript.
-
-    Args:
-        chat_model: The LLM instance for generation.
-        num_examples: Maximum number of QA pairs to generate.
-
-    Returns:
-        List of dicts, each containing 'query' and 'answer'.
+    Use QAGenerateChain to create exactly `num_examples` QA pairs from the transcript,
+    by calling the chain in a loop.
     """
-    # Read the transcript text
-    with open(TRANSCRIPT_PATH, 'r', encoding='utf-8') as f:
-        text = f.read()
-    # Initialize QA generation chain
+    # 1. Load the full transcript text
+    with open(TRANSCRIPT_FILE, 'r', encoding='utf-8') as f:
+        transcript = f.read()
+
+    # 2. Initialize the generation chain
     gen_chain = QAGenerateChain.from_llm(chat_model)
-    # Generate QA examples
-    qa_examples = gen_chain.generate(
-        text=text,
-        max_questions=num_examples
-    )
-    return qa_examples
+
+    # 3. Loop to generate one QA pair per iteration
+    inputs = [{"doc": transcript} for _ in range(NUM_EXAMPLES)]
+    examples = gen_chain.generate(inputs)
+    examples = [{"query": q, "answer": a} for (q, a) in examples]
+    return examples
 
 
 def generate_predictions(qa_chain, examples: list[dict]) -> list[dict]:
@@ -94,13 +86,19 @@ def run_evaluation(chat_model, examples: list[dict], predictions: list[dict]) ->
         List of evaluation result dicts, each containing 'score' and optional 'reasoning'.
     """
     eval_chain = QAEvalChain.from_llm(chat_model)
-    results = eval_chain.evaluate(
-        examples=examples,
-        predictions=predictions,
-        question_key='query',
-        prediction_key='prediction',
-        answer_key='answer'
-    )
+    results = []
+    for example, prediction in zip(examples, predictions):
+        # Defensive: Ensure keys exist
+        if 'query' not in example or 'answer' not in example or 'prediction' not in prediction:
+            raise ValueError(f"Missing required key in example or prediction: {example}, {prediction}")
+        result = eval_chain.evaluate(
+            examples=[example],  # single example
+            predictions=[prediction],
+            question_key='query',
+            prediction_key='prediction',
+            answer_key='answer'
+        )
+        results.append(result)
     return results
 
 
@@ -119,6 +117,8 @@ def write_results(examples: list[dict], predictions: list[dict], results: list[d
         writer = csv.writer(csvfile)
         writer.writerow(['question', 'ground_truth', 'prediction', 'score', 'reasoning'])
         for ex, pred, res in zip(examples, predictions, results):
+            if isinstance(res, list):
+                    res = res[0] if res else {}
             writer.writerow([
                 ex['query'],
                 ex['answer'],
@@ -143,6 +143,7 @@ def compute_accuracy(results: list[dict]) -> float:
     total = len(results)
     correct = 0
     for res in results:
+        res = res[0] if res else {}
         score = res.get('score') or (1 if res.get('results') == 'CORRECT' else 0)
         if score == 1:
             correct += 1
@@ -156,8 +157,8 @@ def evaluate_test_set():
     Returns:
         Accuracy percentage (0-100).
     """
-    qa_chain, chat_model = load_pipeline()
-    examples = generate_examples(chat_model)
+    qa_chain, chat_model = load_pipeline(return_source_documents=False)
+    examples = generate_examples(chat_model,30)
     predictions = generate_predictions(qa_chain, examples)
     results = run_evaluation(chat_model, examples, predictions)
     write_results(examples, predictions, results)
@@ -222,6 +223,73 @@ def check_faithfulness(examples: list[dict], qa_chain, llm) -> list[dict]:
             'faithfulness': faithfulness
         })
     return results
+
+
+import csv
+
+def results_to_csv(results, csv_path):
+    """
+    Converts a list of dictionaries (results) to a CSV file.
+
+    Parameters:
+    - results: List[Dict[str, Any]], where each dict represents a row.
+    - csv_path: str, path to the output CSV file.
+    """
+    if not results:
+        raise ValueError("The results list is empty.")
+
+    # Determine CSV columns from the first result
+    columns = list(results[0].keys())
+
+    with open(csv_path, 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=columns)
+        writer.writeheader()
+        for row in results:
+            # Ensure all values are stringifiable
+            clean_row = {col: (row.get(col, "") if isinstance(row.get(col, ""), str) else str(row.get(col, "")))
+                         for col in columns}
+            writer.writerow(clean_row)
+import csv
+
+def results_to_csv_flat(results, csv_path):
+    """
+    Converts a list of dictionaries (results) to a CSV file,
+    flattening the 'faithfulness' dict into separate 'label' and 'explanation' columns.
+    
+    Parameters:
+    - results: List[Dict[str, Any]], where each dict represents a row and may include a 'faithfulness' dict.
+    - csv_path: str, path to the output CSV file.
+    """
+    if not results:
+        raise ValueError("The results list is empty.")
+    
+    # Flatten each row
+    flattened = []
+    for row in results:
+        new_row = {}
+        for key, value in row.items():
+            if key == 'faithfulness' and isinstance(value, dict):
+                new_row['label'] = value.get('label', '')
+                new_row['explanation'] = value.get('explanation', '')
+            else:
+                # Ensure all other values are stringifiable
+                new_row[key] = value if isinstance(value, str) else str(value)
+        flattened.append(new_row)
+    
+    # Determine CSV columns from the first flattened row
+    columns = list(flattened[0].keys())
+    
+    # Write to CSV
+    with open(csv_path, 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=columns)
+        writer.writeheader()
+        for row in flattened:
+            writer.writerow(row)
+
+# Example usage:
+# results_to_csv_flat(results, '/mnt/data/flattened_results.csv')
+# print("CSV file saved to /mnt/data/flattened_results.csv")
+
 
 
 def main():

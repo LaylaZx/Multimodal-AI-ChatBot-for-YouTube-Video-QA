@@ -17,13 +17,23 @@ from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
 from openai import OpenAI
 from langchain.prompts import PromptTemplate
+from langchain.callbacks.manager import CallbackManager
+from langchain.callbacks.tracers import LangChainTracer
+
 
 def load_environment():
     load_dotenv()
     api_key = os.getenv('OPENAI_API_KEY')
     if not api_key:
         raise ValueError('OPENAI_API_KEY not found in environment.')
-    chat_model = ChatOpenAI(openai_api_key=api_key, temperature=0)
+    tracer = LangChainTracer()
+    callback_manager = CallbackManager([tracer])
+
+    chat_model = ChatOpenAI(
+        openai_api_key=api_key, 
+        temperature=0, 
+        callback_manager=callback_manager,
+        verbose=True)
     client = OpenAI()
     return api_key, chat_model, client
 
@@ -206,8 +216,8 @@ def process_audio(
 
 
 def load_and_split_documents(dirc_path: str = "./transcripts",
-                             chunk_size: int = 1000,
-                             chunk_overlap: int = 200) -> list:
+                             chunk_size: int = 600,
+                             chunk_overlap: int = 100) -> list:
     
     loader = DirectoryLoader(
             dirc_path,
@@ -231,15 +241,23 @@ def create_vectorstore(docs: list, api_key):
 def build_qa_chain(vector_store, chat_model, return_source_documents) -> RetrievalQA:
 # Custom Prompt Template for Strict QA
     STRICT_QA_PROMPT = PromptTemplate(
-        template="""Answer ONLY from the video transcript. If not found, say "This information is not mentioned in the transcript of the video".
-        
-        Transcript: {context}
-        
-        Question: {question}
-        
-        Answer:""",
-        input_variables=["context", "question"]
-    )
+    template="""You are a strict assistant. Using ONLY the provided video transcript chunk, answer the question below.
+If the answer is not present in this chunk, say: "This information is not mentioned in this part of the transcript."
+
+After your answer, rate how relevant your answer is to the question on a scale from 1 (not relevant) to 5 (very relevant).
+
+Transcript chunk:
+{context}
+
+Question:
+{question}
+
+Answer:
+
+Relevance score (1-5):""",
+    input_variables=["context", "question"]
+)
+
     return RetrievalQA.from_chain_type(
             llm=chat_model,
             chain_type="stuff",
