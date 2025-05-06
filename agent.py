@@ -30,7 +30,7 @@ def generate_tools(chain):
         Tool(
             name="TranscriptQA",
             func=lambda question: run_TranscriptQA(question, chain),
-            description="Answer questions based solely on the provided video transcript.",
+            description="Answer questions based on the provided video transcript.",
             return_direct=True
         ),
         Tool(
