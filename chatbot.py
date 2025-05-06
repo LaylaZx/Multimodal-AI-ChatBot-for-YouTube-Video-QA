@@ -49,7 +49,7 @@ def initialize_session_state():
 # Process YouTube URL pipeline
 def process_youtube(youtube_url: str):
     api_key, chat_model, client = load_environment()
-    ffmpeg_path: str = r"C:\ffmpeg-7.1.1-full_build\bin\ffmpeg.exe"
+    ffmpeg_path: str = "ffmpeg"
     video_path = download_audio(youtube_url)
     chunk_length_ms: int = 10 * 60 * 1000
     configure_ffmpeg(ffmpeg_path)
@@ -124,8 +124,8 @@ initialize_session_state()
 
 st.title("🚀 Let's BandUp !")
 st.markdown(
-    "BandUp your IELTS assistant 😉 Don't watch the whole thing!  just drop your IELTS video and ask me"
-)
+    "✨BandUp your IELTS assistant!" )
+st.markdown("Don't watch the whole thing!  just drop your IELTS video and ask me 😉")
 # YouTube URL form with spinner below input
 with st.form("youtube-form"):
     st.markdown("**YouTube Transcription**")
