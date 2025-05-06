@@ -122,8 +122,8 @@ def on_submit_chat():
 load_css()
 initialize_session_state()
 
-st.title("🚀 Let's BandUp !")
-st.markdown("✨BandUp! Your IELTS Assistant! 🤩" )
+st.title("🚀 Let's BandUP !")
+st.markdown("✨BandUP! Your IELTS Assistant! 🤩" )
 st.markdown("Don't watch the whole thing!  just drop your IELTS video and ask me 😉")
 # YouTube URL form with spinner below input
 with st.form("youtube-form"):
@@ -168,8 +168,8 @@ with prompt_placeholder:
 bot_avatar = 'ai_icon.png'
 user_avatar = 'user_icon.png'  
 for msg in st.session_state.history:
-    if msg["role"] == "user":
-        with st.chat_message("humen", avatar=user_avatar):
+    if msg["role"] == "human":
+        with st.chat_message("human", avatar=user_avatar):
             st.markdown(msg["content"])
     else:
         with st.chat_message("ai", avatar=bot_avatar):
