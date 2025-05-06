@@ -203,7 +203,7 @@ def process_audio(
     chunk_folder: str = "chunks",
     transcripts_dir: str = "transcripts",
     chunk_length_ms: int = 10 * 60 * 1000,
-    ffmpeg_path: str = r"C:\ffmpeg-7.1.1-full_build\bin\ffmpeg.exe",
+    ffmpeg_path: str = "ffmpeg",
     client=None
 ):
     """
