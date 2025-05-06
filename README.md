@@ -148,7 +148,7 @@ For production deployment, adding automated unit tests for individual functions 
 - **
 - **???**
 ## Deploed App
-[Visit BandUp Demo]([https://your-demo-link.com](https://ieltschatbot.streamlit.app/))
+[Visit BandUp Demo](https://ieltschatbot.streamlit.app/)
 
 
 ## ⚙️ Setup Instructions
