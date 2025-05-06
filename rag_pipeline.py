@@ -241,8 +241,8 @@ def create_vectorstore(docs: list, api_key):
 def build_qa_chain(vector_store, chat_model, return_source_documents) -> RetrievalQA:
 # Custom Prompt Template for Strict QA
     STRICT_QA_PROMPT = PromptTemplate(
-    template="""You are a strict assistant. Using ONLY the provided video transcript chunk, answer the question below.
-If the answer is not present in this chunk, say: "This information is not mentioned in this part of the transcript."
+    template="""You are a ielts assistant. Using the provided video transcript data, answer the question below.
+If the answer is not present in this data, try to answer with info contained in the data if it is not related say "This information is not mentioned in this part of the transcript."
 
 After your answer, rate how relevant your answer is to the question on a scale from 1 (not relevant) to 5 (very relevant).
 
