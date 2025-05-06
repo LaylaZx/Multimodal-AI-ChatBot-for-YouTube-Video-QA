@@ -148,5 +148,25 @@ For production deployment, adding automated unit tests for individual functions 
 - **???**
 
 ## ⚙️ Setup Instructions
+1. Clone the Repository
+
+2. Install Dependencies
+    - Ensure you have Python 3.10+ installed.
+    - Install dependencies using:
+       - 'pip install -r requirements.txt'
+3. Install FFmpeg
+    - BandUp uses pydub for audio processing, which requires FFmpeg.
+    - Download and install FFmpeg for your OS from ffmpeg.org.
+    - If you are on Windows, you can place the FFmpeg binary in a directory and update the path in the code or environment.
+4. Configure FFmpeg Path
+    - If FFmpeg is not in your system PATH, update the path in the code (e.g., in rag_pipeline.py):
+      - AudioSegment.converter = "path/to/ffm
+5. Set Up Environment Variables
+    - Create a .env file in the root directory and add your OpenAI API key:
+      - OPENAI_API_KEY=your_openai_key_here
+
+## 📬 Questions or Contributions?
+Feel free to contact us!
+This project is designed for the open-source community and welcomes improvements and adaptations.
 
 
