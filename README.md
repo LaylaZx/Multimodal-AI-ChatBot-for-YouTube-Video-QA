@@ -15,6 +15,8 @@ This tool is especially valuable for language learners, teachers, and students w
 
 
 ## Architecture Overview
+![photo_2025-05-06_10-09-40](https://github.com/user-attachments/assets/c59e278d-500e-417b-b595-be5c97e8cd6f)
+
 
 
 
