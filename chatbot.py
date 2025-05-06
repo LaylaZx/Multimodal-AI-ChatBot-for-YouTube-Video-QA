@@ -165,15 +165,7 @@ with prompt_placeholder:
         "Submit", type="primary", on_click=on_submit_chat,
         disabled=not st.session_state.transcript_ready
     )
-bot_avatar = 'ai_icon.png'
-user_avatar = 'user_icon.png'  
-for msg in st.session_state.history:
-    if msg["role"] == "human":
-        with st.chat_message("human", avatar=user_avatar):
-            st.markdown(msg["content"])
-    else:
-        with st.chat_message("ai", avatar=bot_avatar):
-            st.markdown(msg["content"])
+
 # Status indicator
 status_placeholder.caption(f"Transcript ready: {st.session_state.transcript_ready}")
 
