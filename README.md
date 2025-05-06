@@ -145,9 +145,12 @@ To ensure the system’s answers are faithful and accurate, we use LLM-based QA 
 For production deployment, adding automated unit tests for individual functions (e.g., chunking, transcription, retrieval) is recommended to catch regressions and ensure maintainability.
 
 - **Multi-Language Support:** Swap Whisper models or add translation for non-English content.
-- **
-- **???**
-## Deploed App
+- **Improved UI/UX:** Refine layout, color themes, and user flow to make the app more intuitive and visually appealing.
+- **Learning Mode:** Add topic-based practice, suggested questions, and vocabulary flashcards to enhance IELTS preparation.
+- **User Playlists:** Allow users to save and share annotated IELTS video collections.
+- **Gamification:** Introduce leaderboards, mock interview bots, and community challenges.
+  
+## Deployed App
 [Visit BandUp Demo](https://ieltschatbot.streamlit.app/)
 
 
