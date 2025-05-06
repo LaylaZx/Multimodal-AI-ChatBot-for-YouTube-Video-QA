@@ -1,4 +1,4 @@
-# 🚀 BandUp: YouTube QA Bot for IELTS Videos
+# 🚀 BandUP: YouTube QA Bot for IELTS Videos
 ## Project Goal
 This project enables real-time question answering for IELTS preparation videos through an AI chatbot that exclusively uses video transcript content. Users provide a YouTube link, and the system:
 
