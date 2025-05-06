@@ -237,29 +237,28 @@ def create_vectorstore(docs: list, api_key):
     embeddings = OpenAIEmbeddings(openai_api_key=api_key, model="text-embedding-ada-002") 
     return FAISS.from_documents(docs, embeddings)
 
-
- def build_qa_chain(vector_store, chat_model, return_source_documents) -> RetrievalQA:
+def build_qa_chain(vector_store, chat_model, return_source_documents) -> RetrievalQA:
 # Custom Prompt Template for Strict QA
-    STRICT_QA_PROMPT = PromptTemplate(
-    template="""You are a ielts assistant. Using the provided video transcript data and tools, answer the question below.
-    If the answer is not present in this data, say: "This information is not mentioned in this part of the transcript."
+    # STRICT_QA_PROMPT = PromptTemplate(
+    # template="""You are a ielts assistant. Using the provided video transcript data and tools, answer the question below.
+    # If the answer is not present in this data, say: "This information is not mentioned in this part of the transcript."
 
 
-     After your answer, rate how relevant your answer is to the question on a scale from 1 (not relevant) to 5 (very relevant).
+    #  After your answer, rate how relevant your answer is to the question on a scale from 1 (not relevant) to 5 (very relevant).
 
-     Transcript chunk:
-     {context}
+    #  Transcript chunk:
+    #  {context}
 
-      Question:
-      {question}
+    #   Question:
+    #   {question}
 
-      Answer:
+    #   Answer:
 
-      Relevance score (1-5):""",
-      input_variables=["context", "question"]
-       )
+    #   Relevance score (1-5):""",
+    #   input_variables=["context", "question"]
+    #    )
 
-    return RetrievalQA.from_chain_type(
+  return RetrievalQA.from_chain_type(
             llm=chat_model,
             chain_type="stuff",
             retriever=vector_store.as_retriever(),
