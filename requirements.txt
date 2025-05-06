@@ -100,3 +100,5 @@ wcwidth==0.2.13
 yarl==1.20.0
 yt-dlp==2025.3.31
 zstandard==0.23.0
+pydub
+faiss-cpu
