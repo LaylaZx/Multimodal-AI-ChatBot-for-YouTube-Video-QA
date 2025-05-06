@@ -23,7 +23,8 @@ This tool is especially valuable for language learners, teachers, and students w
 
 
 ## Architecture Overview
-![bandUP architecture](https://github.com/user-attachments/assets/14fa906f-0666-4938-a087-fd4df056ab2e)
+![photo_2025-05-06_22-39-32](https://github.com/user-attachments/assets/33e43643-9a40-44e1-aa90-214771b5aa05)
+
 
 
 
