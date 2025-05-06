@@ -15,7 +15,7 @@ This tool is especially valuable for language learners, teachers, and students w
 
 
 ## Architecture Overview
-![RAG Architecture]
+
 
 
 ## Core Components
