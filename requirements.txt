@@ -102,3 +102,4 @@ yt-dlp==2025.3.31
 zstandard==0.23.0
 pydub
 faiss-cpu
+ffmpeg-python
