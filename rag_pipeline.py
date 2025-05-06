@@ -238,7 +238,7 @@ def create_vectorstore(docs: list, api_key):
     return FAISS.from_documents(docs, embeddings)
 
 
-# def build_qa_chain(vector_store, chat_model, return_source_documents) -> RetrievalQA:
+ def build_qa_chain(vector_store, chat_model, return_source_documents) -> RetrievalQA:
 # # Custom Prompt Template for Strict QA
 #     STRICT_QA_PROMPT = PromptTemplate(
 #     template="""You are a ielts assistant. Using the provided video transcript data and tools, answer the question below.
