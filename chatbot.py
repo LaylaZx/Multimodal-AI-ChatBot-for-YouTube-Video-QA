@@ -51,7 +51,7 @@ def initialize_session_state():
 # Process YouTube URL: download, transcribe, build vectorstore and agent
 def process_youtube(youtube_url: str):
     api_key, chat_model, client = load_environment()
-    ffmpeg_path: str = r"C:\ffmpeg-7.1.1-full_build\bin\ffmpeg.exe"
+    ffmpeg_path: str = "ffmpeg"
     chunk_length_ms: int = 10 * 60 * 1000
     video_path = download_audio(youtube_url)
     configure_ffmpeg(ffmpeg_path)
